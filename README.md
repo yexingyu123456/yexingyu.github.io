@@ -3,15 +3,15 @@
  这里是叶星宇的博客，正在学习如何进行各种操作。
  
  以下为Javascript学习内容
- <!DOCTYPE html>
-<html>
-    <head>
-	    <meta charset="utf-8" />
-		<title>js学习</title>
-		<!--
+
+
+ 
+
+
+
 			可以将js代码写到外部js文件中，然后通过script标签引入
 			引用后不能再在这个script标签中编写代码，可以新建一个标签编写
-		-->
+
 
 		<!--<script type="text/javascript" src="scripts/main.js"></script>-->
       
@@ -683,16 +683,14 @@ valueOf()  返回数组对象的原始值
 
 
 
-		</script>
-		</head>
-		<body>
-		<!--
-			将js代码编写到onclick属性中
+
 		
-		<button onclick="alert('你是大帅哥');">按钮</button>-->
-	    <!--
-			可以将js写在超链接的href属性中，点击超链接时会执行js
+	
+	
+
 		
-		<a href="javascript:alert('你是小帅哥')">超链接</a>-->
-		</body>
-</html>
+
+
+
+		
+
