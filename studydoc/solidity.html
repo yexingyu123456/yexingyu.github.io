@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>solidity语言学习</title>
+    </head>
+  <body>
+        <h1>solidity语言学习</h1> 
+		<h2>ethernaut靶场刷题</h2>
+	    <h3>1.Hello Ethernaut</h3>
+		<p>按照要求在控制台输入指定内容即可</p>
+		<p>合约交互包含player和contract，player代表用户钱包地址，contract包含合约实列abi，address以及方法等信息。</p>
+		<p>第一步调用contract.info(),查看结果可知:</p>
+		<p>第二步调用contract.info1(),查看结果可知:</p>
+		<p>第三步调用contract.info2('hello'),查看结果可知:</p>
+		<p>第四步调用contract.infoNum(),查看结果可知:</p>
+		<p>第五步调用contract.info42(),查看结果可知:</p>
+		<p>第六步调用contract.theMethodName(),查看结果可知:</p>
+		<p>第七步调用contract.method7123949(),查看结果可知:</p>
+		<p>第八步调用contract.password(),查看结果可知:</p>
+		<p>第九步调用contract.authenticate(authenticate0),结束游戏</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut2.png">
+		<br><br>
+		<br><br>
+		<br><br>
+		<h3>2.Fallback</h3>
+		<p>题目要求:获得合约所有权并把余额清零</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut1.png">
+		<p>观察可知:</p>
+		<p>创建合约后 owner 有 1000ether ,调用 contribute() 需要转入超过 owner 的量即可改变 owner ,但是要求 msg.value 小于 0.001 ether </p>
+		<p>receive() 要求合约调用者的 ether 大于0,所以需要先调用一次 contribute() 函数,然后向合约发送任意 ether 即可改变 owner </p>
+		<p>成为 owner 后,调用 withdraw() 即可清空合约 ether </p>
+		<p>第一步调用contract.contribute({value:1})向合约发送1wei</p>
+		<p>第二步调用contract.sendTransaction({value:1})向合约发送1wei,或直接使用钱包向合约转账,成为owner</p>
+		<p>第三步调用contract.withedraw()即可清空合约ether,游戏结束</p>
+  </body>
+</html>
