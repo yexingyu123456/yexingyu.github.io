@@ -125,5 +125,28 @@
 					
 		</code></pre>
 		<p>在remix使用injected web3环境部署合约,然后填入被攻击合约的地址即可。调用10次attack(被攻击合约的地址),直到consecutiveWins为10,结束游戏</p>
+		<br><br><br><br>
+		<h3>5.Telephone</h3>
+		<p>题目要求:</p>
+		<p>获得合约所有权</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/ethernaut5.png">
+		<p>题目中msg.sender是合约调用者的地址[msg.sender ( address ): 消息发送者（当前调用）]</p>
+		<p>[tx.origin ( address ): 交易发起者（完全的调用链）]</p>
+		<p>由此创建一个合约进行调用即可满足(tx.origin != msg.sender)</p>
+		<p>创建如下合约,已经知道原合约代码直接复制使用即可。否则可以使用interface进行调用</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut5.png">
+		<p>部署合约时填入题目合约的地址,调用attack时填入自己钱包地址,完成后即可改变owner,游戏结束</p>
+		<br><br><br><br>
+		<h3>6.Token</h3>
+		<p>题目要求:</p>
+		<p>增加自己的Token</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut6.png">
+		<p>查看transfer后可知:</p>
+		<p>对 require(balances[msg.sender] - _value >= 0)的要求,现在msg.sender所对应的Token有20个,如果让——value大于20就会发生向下溢出满足该要求</p>
+		<p>如果转账给自己,又会发生向上溢出,相当于没有转账。所以:</p>
+		<p>第一步调用contract.transfer函数,address填除了自己以外的任意地址,Value的值大于20即可</p>
+		<p>第二步调用contract.balanceOf(player)查看自己的Token,如果变得很大则游戏结束</p>
   </body>
 </html>
