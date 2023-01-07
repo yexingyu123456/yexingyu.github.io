@@ -148,5 +148,28 @@
 		<p>如果转账给自己,又会发生向上溢出,相当于没有转账。所以:</p>
 		<p>第一步调用contract.transfer函数,address填除了自己以外的任意地址,Value的值大于20即可</p>
 		<p>第二步调用contract.balanceOf(player)查看自己的Token,如果变得很大则游戏结束</p>
+		<br><br><br><br>
+		<h3>7.Delegation</h3>
+		<p>题目要求:</p>
+		<p>获取到Delegation的owner</p>
+		<p>题目合约:</p>
+		<img src="https://yexingyu123456.github.io/photograph/Ethernaut7.png">
+		<p>Delegation中有fallback函数,delegatecall可以使用合约delegate的pwn函数更换owner</p>
+		<p>call: 最常用的调用方式，调用后内置变量 msg 的值会修改为调用者，执行环境为被调用者的运行环境(合约的 storage)。</p>
+        <p>delegatecall: 调用后内置变量 msg 的值不会修改为调用者，但执行环境为调用者的运行环境。</p>
+        <p>callcode: 调用后内置变量 msg 的值会修改为调用者，但执行环境为调用者的运行环境</p>
+		<a href="https://learnblockchain.cn/docs/web3.js/web3-utils.html#sha3">web3-utils内容</a>
+		<p>sendTransaction中的参数</p>
+		<pre><code>
+			from: DATA, 20字节 - 发送交易的源地址
+			to: DATA, 20字节 - 交易的目标地址，当创建新合约时可选
+			gas: QUANTITY - 交易执行可用gas量，可选整数，默认值90000，未用gas将返还。
+			gasPrice: QUANTITY - gas价格，可选，默认值：待定(To-Be-Determined)
+			value: QUANTITY - 交易发送的金额，可选整数
+			data: DATA - 合约的编译带啊或被调用方法的签名及编码参数
+			nonce: QUANTITY - nonce，可选。可以使用同一个nonce来实现挂起的交易的重写</code></pre>
+			<p>第一步:调用contract.sendTransaction({data:web3.utils.keccak256("pwn()").slice(0,10)})</p>
+			<p>其中slice表示取10   length</p>
+			<p>调用完成后和获取到owner</p>
   </body>
 </html>
