@@ -171,5 +171,175 @@
 			<p>第一步:调用contract.sendTransaction({data:web3.utils.keccak256("pwn()").slice(0,10)})</p>
 			<p>其中slice表示取10   length</p>
 			<p>调用完成后和获取到owner</p>
+			<br><br><br><br><br>
+			<h3>8.</h3>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<h2>其他练习题目</h2>
+			<h3>Copy_wallet.sol</h3>
+			<p>题目如下:</p>
+			<pre><code>
+			//SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+import "@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol";
+interface IERC20 {
+
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+
+contract ERC20 is IERC20 {
+
+    string public constant name = "ERC20";
+    string public constant symbol = "ERC";
+    uint8 public constant decimals = 18;
+    mapping(address => uint256) balances;
+
+    mapping(address => mapping (address => uint256)) allowed;
+
+    uint256 totalSupply_ = 10 ether;
+   constructor() {
+    balances[msg.sender] = totalSupply_;
+    }
+    function totalSupply() public override view returns (uint256) {
+    return totalSupply_;
+    }
+    function balanceOf(address tokenOwner) public override view returns (uint256) {
+        return balances[tokenOwner];
+    }
+    function transfer(address receiver, uint256 numTokens) public override returns (bool) {
+        require(numTokens <= balances[msg.sender]);
+        balances[msg.sender] = balances[msg.sender]-numTokens;
+        balances[receiver] = balances[receiver]+numTokens;
+        emit Transfer(msg.sender, receiver, numTokens);
+        return true;
+    }
+    function approve(address delegate, uint256 numTokens) public override returns (bool) {
+        allowed[msg.sender][delegate] = numTokens;
+        emit Approval(msg.sender, delegate, numTokens);
+        return true;
+    }
+    function allowance(address owner, address delegate) public override view returns (uint) {
+        return allowed[owner][delegate];
+    }
+    function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {
+        require(numTokens <= balances[owner]);
+        require(numTokens <= allowed[owner][msg.sender]);
+
+        balances[owner] = balances[owner]-numTokens;
+        allowed[owner][msg.sender] = allowed[owner][msg.sender]-numTokens;
+        balances[buyer] = balances[buyer]+numTokens;
+        emit Transfer(owner, buyer, numTokens);
+        return true;
+    }
+}
+
+contract wallet {
+    struct Wallet{
+        string walletName;
+        uint256 uniqueTokens;
+        mapping(address => uint256)balances;
+    }
+    struct Slot{
+        bytes32 value;
+    }
+    mapping(address => Wallet[])public wallets;
+    ERC20 public fake;
+    event SendFlag(string email);
+    constructor(){
+        fake = new ERC20();
+        
+        wallets[address(this)].push();
+        Wallet storage wallet = wallets[address(this)][0];
+        wallet.walletName="cuit";
+        wallet.uniqueTokens=1;
+        wallet.balances[address(fake)]= 10 ether;
+    }
+
+    function addWallet(string memory name,address _token,uint256 amount)public{
+        require(IERC20(_token).transferFrom(msg.sender,address(this),amount),"transferFrom failed");
+
+        wallets[msg.sender].push();
+        Wallet storage wallet = wallets[msg.sender][wallets[msg.sender].length-1];
+        wallet.walletName=name;
+        wallet.uniqueTokens=1;
+        wallet.balances[_token] = amount;
+    }
+
+    function addWalletToken(uint256 index,address _token,uint256 amount)public{
+        require(IERC20(_token).transferFrom(msg.sender,address(this),amount),"transferFrom failed");
+        require(wallets[msg.sender].length-index>0);
+
+        Wallet storage wallet = wallets[msg.sender][index];
+        wallet.uniqueTokens++;
+        wallet.balances[_token] = amount;
+    }
+
+    function getTokenBalance(address _addr,uint256 index,address _token)public view returns(uint256 amount){
+        return wallets[_addr][index].balances[_token];
+    }   
+
+    function setSlot(bytes32 slot,bytes32 value)public {
+        require(uint160(msg.sender)&0xff == 0x23);
+        StorageSlotUpgradeable.getBytes32Slot(slot).value = value;
+    }
+
+    function isCompleted(string memory email)public{
+        require(wallets[address(this)][0].balances[address(fake)]==0);
+        emit SendFlag(email);
+    }
+    
+}
+			</code></pre>
+			<p>题目要求:</p>
+			<p>清空合约ether</p>
+			<p>观察可知:</p>
+			<p>setSlot函数可以改变对应槽中的数据,其require要求调用者地址的最后两位为23</p>
+			<p>改变对应槽中的数据可以选择改变fake对应槽或者选择改变10个ether对应槽中的数据</p>
+			<p>选择create2来计算合约地址最后两位为23,用这个地址来部署攻击合约调用setSlot()</p>
+			<p>攻击合约如下:</p>
+			<img src="https://yexingyu123456.github.io/photograph/exam1.png">
+			<P>攻击合约中attack()中addr为wallet合约的地址,create2Factory合约中调用getaddress获取最后两位为23的地址,并获得slot</P>
+			<p>deploy(slot),部署攻击合约</p>
+			<p>部署完成后调出该合约,调用其中的slot函数,_slot为_value所对应的key,改变对应槽中的数据可以选择改变fake对应槽或者选择改变10个ether对应槽中的数据</p>
+            <p>完成后可以查看wallet合约的getTokenBalance()查看是否清零,调用isCompleted()通过即可</p>
   </body>
 </html>
