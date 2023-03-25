@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>靶场笔记</title>
+    </head>
+    <body>
+        <h1>Capture the Ether的题解</h1>
+        <br/><br/><br/><br/>
+        <h3>Call me</h3>
+        <p>合约如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+            contract CallMeChallenge {
+                bool public isComplete = false;
+            
+                function callme() public {
+                    isComplete = true;
+                }
+            }
+        </code></pre>
+        <p>直接调用call me即可</p>
+        <br/><br/><br/><br/>
+        <h3>Choose a nickname</h3>
+        <h3>合约如下</h3>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+// Relevant part of the CaptureTheEther contract.
+contract CaptureTheEther {
+    mapping (address => bytes32) public nicknameOf;
+
+    function setNickname(bytes32 nickname) public {
+        nicknameOf[msg.sender] = nickname;
+    }
+}
+
+// Challenge contract. You don't need to do anything with this; it just verifies
+// that you set a nickname for yourself.
+contract NicknameChallenge {
+    CaptureTheEther cte = CaptureTheEther(msg.sender);
+    address player;
+
+    // Your address gets passed in as a constructor parameter.
+    function NicknameChallenge(address _player) public {
+        player = _player;
+    }
+
+    // Check that the first character is not null.
+    function isComplete() public view returns (bool) {
+        return cte.nicknameOf(player)[0] != 0;
+    }
+}
+        </code></pre>
+        <p>将名字转化为bytes32类型后调用函数即可</p>
+        <br/><br/><br/><br/>
+        <h3>Guess the number</h3>
+        <p>合约如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+contract GuessTheNumberChallenge {
+    uint8 answer = 42;
+
+    function GuessTheNumberChallenge() public payable {
+        require(msg.value == 1 ether);
+    }
+
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function guess(uint8 n) public payable {
+        require(msg.value == 1 ether);
+
+        if (n == answer) {
+            msg.sender.transfer(2 ether);
+        }
+    }
+}
+        </code></pre>
+        <p>根据合约，uint8 answer = 42;</p>
+        <p>直接调用guess函数，填入42即可</p>
+        <br\><br/><br/><br/>
+        <h3>GuessTheSecretNumberChallenge</h3>
+        <p>题目如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+contract GuessTheSecretNumberChallenge {
+    bytes32 answerHash = 0xdb81b4d58595fbbbb592d3661a34cdca14d7ab379441400cbfa1b78bc447c365;
+
+    function GuessTheSecretNumberChallenge() public payable {
+        require(msg.value == 1 ether);
+    }
+    
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function guess(uint8 n) public payable {
+        require(msg.value == 1 ether);
+
+        if (keccak256(n) == answerHash) {
+            msg.sender.transfer(2 ether);
+        }
+    }
+}
+        </code></pre>
+        <p>根据合约可知，需要猜的数字是uint8类型，取值在0~256之间，所以编写如下合约计算</p>
+        <pre><code>
+            contract attack_{
+                bytes32 answerHash = 0xdb81b4d58595fbbbb592d3661a34cdca14d7ab379441400cbfa1b78bc447c365;
+                uint8 public i;
+                function isguess() public returns(uint8){
+                for(i=0;i<256;i++)
+                {
+                    if(keccak256(i)==answerHash)
+                      {
+                        return i;
+                      }
+                }
+              }
+            }>
+        </code></pre>
+        <p>计算得到的数字就是需要guess的数字了</p>
+        <br/><br/><br/><br/>
+        <h3>Guess the random number</h3>
+        <p>合约如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+contract GuessTheRandomNumberChallenge {
+    uint8 answer;
+
+    function GuessTheRandomNumberChallenge() public payable {
+        require(msg.value == 1 ether);
+        answer = uint8(keccak256(block.blockhash(block.number - 1), now));
+    }
+
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function guess(uint8 n) public payable {
+        require(msg.value == 1 ether);
+
+        if (n == answer) {
+            msg.sender.transfer(2 ether);
+        }
+    }
+}
+        </code></pre>
+        <p>由合约，根据槽的规则，answer应该存储在slot0的位置</p>
+        <p>由于Ropsten test network已经不能使用，将合约部署到goerli测试网中</p>
+        <p>部署完成后拿到合约地址，使用web3.eth.getStorageAt("0x84D8d900Fed103Da82f4b28420655f2f6aEae369",0)获取到answer</p>
+        <p>如图</p>
+        <img src="https://yexingyu123456.github.io/photograph/bachang2.png">
+        <img src="https://yexingyu123456.github.io/photograph/bachang1.png">
+    </body>
+</html>
