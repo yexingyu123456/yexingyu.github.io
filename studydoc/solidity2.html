@@ -331,5 +331,197 @@ contract PredictTheFutureChallenge {
             
         </code></pre>
         <p>部署两个合约，并调用攻击合约的lock函数，随后等到能够调用att函数，再调用att函数。</p>
+        <br\><br\><br\><br\><br\><br>
+        <h3>Token sale</h3>
+        <p>合约代码如下</p>
+        <pre><code>
+            pragma solidity ^0.4.21;
+
+            contract TokenSaleChallenge {
+                mapping(address => uint256) public balanceOf;
+                uint256 constant PRICE_PER_TOKEN = 1 ether;
+            
+                function TokenSaleChallenge(address _player) public payable {
+                    require(msg.value == 1 ether);
+                }
+            
+                function isComplete() public view returns (bool) {
+                    return address(this).balance < 1 ether;
+                }
+            
+                function buy(uint256 numTokens) public payable {
+                    require(msg.value == numTokens * PRICE_PER_TOKEN);
+            
+                    balanceOf[msg.sender] += numTokens;
+                }
+            
+                function sell(uint256 numTokens) public {
+                    require(balanceOf[msg.sender] >= numTokens);
+            
+                    balanceOf[msg.sender] -= numTokens;
+                    msg.sender.transfer(numTokens * PRICE_PER_TOKEN);
+                }
+            }
+            
+
+        </code></pre>
+        <p>对合约分析可知，要使得题目合约的余额小于1ether。这个题问题出在buy方法上，可能存在上溢。因为虽然合约里eth的单位是ether，</p>
+            <p>但是他的存储还是以wei为单位。1 ether=10^18.如果我们传入一个较大的numTokens，产生溢出得到一个很小的value。</p>
+            <p>通过计算，可以得到发生溢出的临界值为115792089237316195423570985008687907853269984665640564039458和</p>
+            <p>415992086870360064</p>
+            <p>传入内容即可通过（先buy，然后sell）</p>
+            <br><br><br><br><br><br>
+            <h3>Token whale</h3>
+            <p>合约代码如下</p>
+            <pre><code>
+                pragma solidity ^0.4.21;
+
+contract TokenWhaleChallenge {
+    address player;
+
+    uint256 public totalSupply;
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+
+    string public name = "Simple ERC20 Token";
+    string public symbol = "SET";
+    uint8 public decimals = 18;
+
+    function TokenWhaleChallenge(address _player) public {
+        player = _player;
+        totalSupply = 1000;
+        balanceOf[player] = 1000;
+    }
+
+    function isComplete() public view returns (bool) {
+        return balanceOf[player] >= 1000000;
+    }
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function _transfer(address to, uint256 value) internal {
+        balanceOf[msg.sender] -= value;
+        balanceOf[to] += value;
+
+        emit Transfer(msg.sender, to, value);
+    }
+
+    function transfer(address to, uint256 value) public {
+        require(balanceOf[msg.sender] >= value);
+        require(balanceOf[to] + value >= balanceOf[to]);
+
+        _transfer(to, value);
+    }
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    function approve(address spender, uint256 value) public {
+        allowance[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+    }
+
+    function transferFrom(address from, address to, uint256 value) public {
+        require(balanceOf[from] >= value);
+        require(balanceOf[to] + value >= balanceOf[to]);
+        require(allowance[from][msg.sender] >= value);
+
+        allowance[from][msg.sender] -= value;
+        _transfer(to, value);
+    }
+}
+
+            </code></pre>
+            <p>分析合约可以得到，通过这关需要我们的token大于1000000</p>
+            <p>根据ERC20函数的内容可知一些函数的功能，transferFrom前面一系列检查都是检查的from，然而转账的时候却是转的msg.sender。</p>
+                <p>也就是说我只要value满足from，但是不满足msg.sender，就可以使 balanceOf[msg.sender] -= value;下溢。</p>
+                <p>我们先向一个地址转账600，然后给我们自己授权600，再转回来，这时_transfer中的balanceOf[msg.sender] -= value;下溢，我们就攻击成功了</p>
+                <br><br><bR><br><br><br><br>
+                <h3>Retirement fund</h3>
+                <p>合约代码如下</p>
+                <pre><code>
+                    pragma solidity ^0.4.21;
+
+contract RetirementFundChallenge {
+    uint256 startBalance;
+    address owner = msg.sender;
+    address beneficiary;
+    uint256 expiration = now + 10 years;
+
+    function RetirementFundChallenge(address player) public payable {
+        require(msg.value == 1 ether);
+
+        beneficiary = player;
+        startBalance = msg.value;
+    }
+
+    function isComplete() public view returns (bool) {
+        return address(this).balance == 0;
+    }
+
+    function withdraw() public {
+        require(msg.sender == owner);
+
+        if (now < expiration) {
+            // early withdrawal incurs a 10% penalty
+            msg.sender.transfer(address(this).balance * 9 / 10);
+        } else {
+            msg.sender.transfer(address(this).balance);
+        }
+    }
+
+    function collectPenalty() public {
+        require(msg.sender == beneficiary);
+
+        uint256 withdrawn = startBalance - address(this).balance;
+
+        // an early withdrawal occurred
+        require(withdrawn > 0);
+
+        // penalty is what's left
+        msg.sender.transfer(address(this).balance);
+    }
+}
+
+                </code></pre>
+                <p>分析合约可知，这个合约内容和Ethernaut靶场中一道题的方法基本一致，withdrawn只要合约地址大于startBalance（1 ether）就能下溢。</p>
+                <p>solidty可以通过自毁将合约余额发送到另一个地址。selfdestruct函数</p>
+                <p>编写如下攻击合约</p>
+                <pre><code>
+                    contract destruct{
+                        function kill()public payable{
+                            selfdestruct(addr);
+                        }
+                    } </code></pre>
+                    <p>其中addr为被攻击合约的地址，调用后就能很简单的通过这个关卡了</p>
+               
+                <br><br><br><br><br><br><br><br><br>
+                <h3>Mapping</h3>
+                <p>题目合约如下</p>
+                <pre><code>
+                    pragma solidity ^0.4.21;
+
+contract MappingChallenge {
+    bool public isComplete;
+    uint256[] map;
+
+    function set(uint256 key, uint256 value) public {
+        // Expand dynamic array as needed
+        if (map.length <= key) {
+            map.length = key + 1;
+        }
+
+        map[key] = value;
+    }
+
+    function get(uint256 key) public view returns (uint256) {
+        return map[key];
+    }
+}
+                </code></pre>
+<p>分析合约可知，这个合约内容和Ethernaut靶场中一道题的方法也有相似之处</p>
+<p>数组的起始位置是通过keccak256(bytes32("数组长度所在插槽"))计算的，所以用2**256-1再减去这个数加一就可以让数组的最后一位是整个storage的第一位，覆盖isCompleted变量。
+
+    调用set函数将value设定为1，isComplete即可变为true。
+</p>
     </body>
 </html>
