@@ -1,0 +1,66 @@
+.a{height:1650px;width:1000px;border:1px ; margin :0px auto;}
+.b{height:200px;width:1000px;border:1px ; margin :0px auto;background-color:rgb(10, 181, 158) ;}
+.c{height:70px;width:1000px;border:1px ; margin :0px auto;background-color: rgb(221, 226, 226);}
+.d{height:210px;width:1000px;border:1px ; margin :0px auto;background-color: rgb(221, 226, 226);}
+.e{height:300px;width:1000px;border:1px ; margin :0px auto}
+.f{height:350px;width:1000px;border:1px ; margin :0px auto}
+.g{height:90px;width:1000px;border:1px ; margin :0px auto;background-color: rgb(221, 226, 226);text-align: center;}
+.h{height:210px;width:1000px;border:1px ; margin :0px auto;background-color: rgb(221, 226, 226);}
+.i{height:210px;width:1000px;border:1px ; margin :0px auto;background-color: rgb(10, 181, 158) ;;}
+.b1{height:50px;width:60px;border:1px ;float:left;background-image: url('图片库/shiyan3.JPG');background-size: 100% 100%;border-radius: 100%;overflow: hidden;}
+.b2{height:50px;width:60px;border:1px ;float:left}
+.b3{height:50px;width:500px;border:1px ;clear:both;background-color:rgb(32, 204, 181)  ;}
+.e1{height:300px;width:331px;border:1px ; margin :0px ;float:left}
+.e11{height:300px;width:220px;border:1px ; margin :0px auto;}
+.e111{height:50px;width:150px;border:1px; margin :0px auto;text-align: center;}
+.e112{height:180px;width:218px;border:1px ; margin :0px auto;}
+.e113{height:30px;width:88px;border:1px ; margin :0px auto;text-align: center;background-color:rgb(10, 181, 158)  ;}
+.e2{height:300px;width:331px;border:1px ; margin :0px ;float:left}
+.e3{height:300px;width:331px;border:1px ; margin :0px ;float:left}
+.f1{height:350px;width:225px;border:1px ; margin :0px auto;float:left}
+.f11{height:150px;width:225px;border:1px ; margin :0px auto;float:left;background-image: url(图片库/shiyan31.JPG);background-size: 100% 100%;}
+.f111{height:96px;width:225px;border:1px ; margin :0px auto;float:left}
+.f12{height:30px;width:125px;border:1px ; margin :0px auto;clear:both;background-color: rgb(10, 181, 158)  ; text-align: center }
+.f13{height:150px;width:225px;border:1px ; margin :0px auto;float:left}
+.f2{height:350px;width:28px;border:1px ; margin :0px auto;float:left}
+.f21{height:150px;width:225px;border:1px; margin :0px auto;float:left}
+.f4{height:350px;width:28px;border:1px ; margin :0px auto;float:left}
+.f6{height:350px;width:28px;border:1px ; margin :0px auto;float:left}
+.hh{height:100px;width:45px;border:1px ; margin :0px auto;float:left}
+.h1{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a1.JPG);background-size: 100% 100%;float:left;border-radius: 90%;overflow: hidden;}
+.h2{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a2.JPG);background-size: 100% 100%;float:left;border-radius: 90%;overflow: hidden;}
+.h3{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a3.JPG);background-size: 100% 100%;float:left;border-radius: 50%;overflow: hidden;}
+.h4{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a4.JPG);background-size: 100% 100%;float:left;border-radius: 50%;overflow: hidden;}
+.h5{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a5.JPG);background-size: 100% 100%;float:left;border-radius: 50%;overflow: hidden;}
+.h6{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a6.JPG);background-size: 100% 100%;float:left;border-radius: 50%;overflow: hidden;}
+.h7{height:100px;width:100px;border:1px ; margin :0px ;background-color: rgb(221, 226, 226);background-image: url(图片库/a7.JPG);background-size: 100% 100%;float:left;border-radius: 50%;overflow: hidden;}
+.i1{height:100px;width:1000px;border:1px ; margin :0px auto;}
+.i2{height:110px;width:1000px;border:1px ; margin :0px auto;}
+
+.i22{height:50px;width:15px;border:1px; margin :0px auto;float:left}
+.i23{height:100px;width:350px;border:1px; margin :0px auto;}
+.i211{height:50px;width:50px;border:1px ; margin :0px auto;float:left ;background-image: url(图片库/b1.JPG);background-size: 100% 100%;}
+.i212{height:50px;width:50px;border:1px ; margin :0px auto;float:left ;background-image: url(图片库/b2.JPG);background-size: 100% 100%;}
+.i213{height:50px;width:50px;border:1px ; margin :0px auto;float:left ;background-image: url(图片库/b3.JPG);background-size: 100% 100%;}
+.i214{height:50px;width:50px;border:1px ; margin :0px auto;float:left ;background-image: url(图片库/b4.JPG);background-size: 100% 100%;}
+.i215{height:50px;width:50px;border:1px; margin :0px auto;float:left ;background-image: url(图片库/b5.JPG);background-size: 100% 100%;}
+
+.write4{font-size:14px;color:white;text-decoration: none;}
+.write2{font-size :12px;color:rgb(0, 0, 0)}
+.write2{font-size :35px;color:rgb(0, 0, 0)}
+.write1{font-size:35px;color:white}
+ul{
+    float:left;
+    list-style-type: none;
+    overflow: hidden;
+}
+
+.text1 li{
+    width :90px;
+    float: left;
+    font-size: 8px;
+    text-align: center;
+}
+.text1 li :hover{
+    color: rgb(12, 22, 211);
+}
